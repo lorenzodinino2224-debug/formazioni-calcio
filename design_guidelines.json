@@ -1,0 +1,167 @@
+{
+  "app_name": "Spoltore Calcio Manager",
+  "personality": "1 iOS-Native Clean",
+  "personality_one_liner": "A pristine, official, and tactical command center that honors the club's maroon and royal blue colors while prioritizing high legibility and operational speed.",
+  "color": {
+    "surface": "#F9F8F6",
+    "onSurface": "#1A1918",
+    "surfaceSecondary": "#FFFFFF",
+    "onSurfaceSecondary": "#1A1918",
+    "surfaceTertiary": "#F0EDE5",
+    "onSurfaceTertiary": "#33312E",
+    "surfaceInverse": "#2B2927",
+    "onSurfaceInverse": "#FFFFFF",
+    "brand": "#7A1E2E",
+    "onBrand": "#FFFFFF",
+    "brandPrimary": "#7A1E2E",
+    "onBrandPrimary": "#FFFFFF",
+    "brandSecondary": "#1F5FAE",
+    "onBrandSecondary": "#FFFFFF",
+    "brandTertiary": "#F2E8EA",
+    "onBrandTertiary": "#7A1E2E",
+    "muted": "#75736F",
+    "success": "#2D7A4A",
+    "onSuccess": "#FFFFFF",
+    "warning": "#B87F0A",
+    "onWarning": "#FFFFFF",
+    "error": "#D33D44",
+    "onError": "#FFFFFF",
+    "info": "#1F5FAE",
+    "onInfo": "#FFFFFF",
+    "border": "#E6E2D8",
+    "borderStrong": "#CFCAC0",
+    "divider": "#E6E2D8",
+    "pitchGreen": "#4A7A3B",
+    "pitchLines": "#FFFFFF"
+  },
+  "typography": {
+    "displayFontFamily": "Geist",
+    "textFontFamily": "Geist",
+    "scale": {
+      "sm": 12,
+      "base": 14,
+      "lg": 16,
+      "xl": 20,
+      "2xl": 24
+    }
+  },
+  "spacing": {
+    "rule": "Generous vertical breathing room for roster lists; precise tight grids for the tactical pitch. Always account for bottom safe area on sticky CTAs.",
+    "xs": 4,
+    "sm": 8,
+    "md": 12,
+    "lg": 16,
+    "xl": 24,
+    "2xl": 32,
+    "3xl": 48
+  },
+  "radius_tokens": {
+    "sm": 6,
+    "md": 12,
+    "lg": 20,
+    "pill": 999
+  },
+  "shadow_tier": "1",
+  "navigation": "bottom_tabs",
+  "icon_set": "Ionicons",
+  "glassmorphism": {
+    "enabled": true,
+    "do's": [
+      "Use frosted glass on the bottom tab bar.",
+      "Use glass for sticky header overlays when roster lists scroll behind them.",
+      "Use glass on the bottom sheet that slides up over the pitch for player selection."
+    ],
+    "dont's": [
+      "Do not use glass on player cards inside the roster list.",
+      "Do not use glass on form inputs."
+    ]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "expo-glass-effect",
+      "android": "expo-blur",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "expo-blur",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler",
+    "pdf": "expo-print and expo-sharing"
+  },
+  "haptics": {
+    "events": {
+      "tab_press": "light",
+      "player_assigned_to_pitch": "medium",
+      "module_changed": "rigid",
+      "generate_pdf": "success"
+    }
+  },
+  "screens": [
+    {
+      "name": "Splash",
+      "purpose": "Brand presentation at launch with the club's crest.",
+      "layout": "Full screen brandPrimary (#7A1E2E) background. Center the user-provided 'Città di Spoltore' logo. No other UI elements.",
+      "states": {
+        "loading": "Static logo view while local storage hydrates.",
+        "empty": "N/A",
+        "error": "N/A"
+      }
+    },
+    {
+      "name": "Rosa (Roster)",
+      "purpose": "Manage the complete list of 11-a-side players (add, edit, photo, role, number).",
+      "layout": "List view categorized by role (Portieri, Difensori, Centrocampisti, Attaccanti). Each player is a card with photo (or initials avatar), number in bold, and name. Use a floating action button (FAB) with glass effect to add a new player. Roster saved locally.",
+      "states": {
+        "loading": "Skeleton list of player cards.",
+        "empty": "Illustration of a jersey with 'Nessun giocatore in rosa. Aggiungi il primo!' and an 'Aggiungi Giocatore' button.",
+        "error": "Message 'Errore nel caricamento della rosa' with a Retry button."
+      }
+    },
+    {
+      "name": "Formazione (Pitch/Tactics)",
+      "purpose": "Select the tactical module and assign players to their positions on the pitch.",
+      "layout": "Vertical scroll-locked view. Top header: Module picker (e.g., 4-4-2, 4-3-3). Main area: Vertical green pitch background (using image). Player slots map to the selected module. Tap a slot to open a glassmorphic bottom sheet containing available players (Rosa). Tap a player to assign them. Includes a 'Save Scheme' button at the top right.",
+      "states": {
+        "loading": "Spinner over an empty pitch outline.",
+        "empty": "Pitch shows empty position slots based on the default 4-4-2 module.",
+        "error": "Message 'Errore nel caricamento del modulo' with a Retry button."
+      }
+    },
+    {
+      "name": "Convocati (Call-ups)",
+      "purpose": "Select which players from the roster are called up for the upcoming match.",
+      "layout": "Top section: Inputs for 'Avversario' (Opponent) and 'Data' (Date). Main section: Checkbox list of all players grouped by role. Bottom: Sticky primary CTA 'Salva Convocati' that stays fixed while the list scrolls.",
+      "states": {
+        "loading": "Skeleton list with checkboxes.",
+        "empty": "Illustration of a clipboard with 'Aggiungi giocatori alla rosa per poterli convocare'.",
+        "error": "Message 'Errore nel caricamento dei giocatori' with a Retry button."
+      }
+    },
+    {
+      "name": "Moduli/Stampa (Print)",
+      "purpose": "Generate and share PDF versions of the roster, call-ups, and formations.",
+      "layout": "Grid of three large cards: 'Distinta Convocati', 'Formazione in Campo', 'Rosa Completa'. Tapping a card triggers PDF generation using expo-print and opens the native share sheet to print or send via WhatsApp/email.",
+      "states": {
+        "loading": "Generating PDF spinner overlay.",
+        "empty": "N/A",
+        "error": "Toast notification: 'Impossibile generare il PDF'."
+      }
+    }
+  ],
+  "images": {
+    "pitch_background": {
+      "url": "https://images.unsplash.com/photo-1546608235-3310a2494cdf?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHwxfHxzb2NjZXIlMjBjb2FjaCUyMHRhY3RpY3MlMjBib2FyZHxlbnwwfHx8fDE3OTQ1ODYzNDB8MA&ixlib=rb-4.1.0&q=85",
+      "alt": "Vertical green soccer pitch layout"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Design constraint: Follow iOS-Native Clean (Personality 1). App must feel official, clean, and highly structured.",
+    "Brand colors applied: The user specifically requested 'Città di Spoltore' crest colors. Maroon/Burgundy (#7A1E2E) is the primary brand color, and Royal Blue (#1F5FAE) acts as secondary. Base backgrounds use a warm off-white (Beige tower reference).",
+    "Zero Tolerance: Do not use generic emoji for any system UI elements. Use Ionicons consistently.",
+    "Splash Screen: The user mentioned 'ti allego il logo' (I attached the logo). Since you don't have direct access to their local attachment, build an Image component pointing to a local asset path (e.g., require('../assets/images/logo.png')) and add a placeholder or fallback. Instruct the user to drop their logo into the assets folder.",
+    "Tactical Pitch Logic: The pitch must orient vertically. Map out module coordinates (4-4-2, 4-3-3, 3-5-2) so that empty slots dynamically render over the pitch background image based on the picker selection.",
+    "Local Storage: All data (players, images, saved formations, match details) must be stored using AsyncStorage or a local SQLite database (e.g., expo-sqlite) since the user explicitly requested local-only storage.",
+    "PDF Generation: Use expo-print to generate HTML-to-PDF layouts for the Distinta, Formazione, and Rosa, and use expo-sharing to allow the user to print or share the resulting PDF."
+  ]
+}

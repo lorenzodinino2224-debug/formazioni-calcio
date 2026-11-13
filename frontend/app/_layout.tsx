@@ -1,10 +1,13 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { LogBox, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 
 import { ErrorBoundary } from "@/src/components/error-boundary";
+import { ToastProvider } from "@/src/components/Toast";
+import { DataProvider } from "@/src/data/store";
 import { queryClient } from "@/src/query-client";
 
 // Disable logbox errors etc so that users can see the app
@@ -12,15 +15,22 @@ import { queryClient } from "@/src/query-client";
 LogBox.ignoreAllLogs(true)
 
 export default function RootLayout() {
-  // One app level ErrorBoundary; a render crash shows a reload screen
-  // instead of a blank app. GestureHandlerRootView must wrap the whole tree
-  // or any gesture/swipe/drawer screen crashes in Expo Go.
   return (
     <GestureHandlerRootView style={styles.root}>
       <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
           <KeyboardProvider>
-            <Stack screenOptions={{ headerShown: false }} />
+            <DataProvider>
+              <ToastProvider>
+                <StatusBar style="light" />
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="index" options={{ animation: "fade" }} />
+                  <Stack.Screen name="(tabs)" options={{ animation: "fade" }} />
+                  <Stack.Screen name="player/[id]" options={{ presentation: "modal" }} />
+                  <Stack.Screen name="callup/[id]" options={{ presentation: "modal" }} />
+                </Stack>
+              </ToastProvider>
+            </DataProvider>
           </KeyboardProvider>
         </QueryClientProvider>
       </ErrorBoundary>

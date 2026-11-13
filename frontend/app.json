@@ -1,22 +1,29 @@
 {
   "expo": {
-    "name": "frontend",
+    "name": "Città di Spoltore",
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "frontend",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.emergent.formazionicalcio.b5wv7o"
+      "bundleIdentifier": "com.emergent.formazionicalcio.b5wv7o",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Scatta le foto dei giocatori della rosa",
+        "NSPhotoLibraryUsageDescription": "Scegli le foto dei giocatori dalla galleria"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#2A0A12"
       },
-      "package": "com.emergent.formazionicalcio.b5wv7o"
+      "package": "com.emergent.formazionicalcio.b5wv7o",
+      "permissions": [
+        "android.permission.CAMERA"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -31,14 +38,23 @@
           "image": "./assets/images/splash-image.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#000000"
+          "backgroundColor": "#7A1E2E"
         }
       ],
       "expo-font",
       "expo-image",
       "expo-secure-store",
       "expo-web-browser",
-      "expo-status-bar"
+      "expo-status-bar",
+      "expo-sharing",
+      "@react-native-vector-icons/ionicons",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Scegli le foto dei giocatori dalla galleria",
+          "cameraPermission": "Scatta le foto dei giocatori della rosa"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

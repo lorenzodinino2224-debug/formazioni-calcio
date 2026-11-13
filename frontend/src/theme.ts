@@ -36,53 +36,44 @@ import { Appearance, StyleSheet, useColorScheme } from "react-native";
 export type ColorScheme = "light" | "dark";
 
 const light = {
-  // ---------------------------------------------------------------------------
-  // Surfaces: backgrounds, from the screen down to small fills.
-  // Each `on` key is the text and icon color for that background.
-  // ---------------------------------------------------------------------------
-  surface: "#FFFFFF", // primary canvas, most of every screen
-  onSurface: "#111827", // text and icons on the canvas
-  surfaceSecondary: "#F9FAFB", // cards, sheets, list rows
-  onSurfaceSecondary: "#374151", // text and icons on cards, sheets, rows
-  surfaceTertiary: "#F3F4F6", // input backgrounds, chips, deepest nesting
-  onSurfaceTertiary: "#4B5563", // text on inputs and chips; also muted text
-  surfaceInverse: "#1F2937", // tooltips, snackbars, anything popping against the theme
-  onSurfaceInverse: "#FFFFFF", // text and icons on the inverse surface
-  muted: "#6B7280", // subdued text on surface: captions, timestamps, placeholders
+  surface: "#F9F8F6",
+  onSurface: "#1A1918",
+  surfaceSecondary: "#FFFFFF",
+  onSurfaceSecondary: "#1A1918",
+  surfaceTertiary: "#F0EDE5",
+  onSurfaceTertiary: "#33312E",
+  surfaceInverse: "#2B2927",
+  onSurfaceInverse: "#FFFFFF",
+  muted: "#75736F",
 
-  // ---------------------------------------------------------------------------
-  // Brand: the identity color and the fills built from it.
-  // Neutral by default; replace with the design guidelines values.
-  // ---------------------------------------------------------------------------
-  brand: "#111827", // base hue, anchor only; Primary, Secondary, Tertiary are weights of it
-  onBrand: "#FFFFFF", // text and icons placed directly on brand
-  brandPrimary: "#111827", // primary CTA, active tab indicator, selected states
-  onBrandPrimary: "#FFFFFF", // text and icons on brandPrimary
-  brandSecondary: "#E5E7EB", // secondary CTA, less prominent accents
-  onBrandSecondary: "#111827", // text and icons on brandSecondary
-  brandTertiary: "#F3F4F6", // chips, tags, badges, subtle brand moments
-  onBrandTertiary: "#111827", // text and icons on brandTertiary
+  brand: "#7A1E2E",
+  onBrand: "#FFFFFF",
+  brandPrimary: "#7A1E2E",
+  onBrandPrimary: "#FFFFFF",
+  brandSecondary: "#1F5FAE",
+  onBrandSecondary: "#FFFFFF",
+  brandTertiary: "#F2E8EA",
+  onBrandTertiary: "#7A1E2E",
+  brandDeep: "#4E1019", // darker maroon for header gradients / splash
+  brandSky: "#4FA3E0", // light blue from the crest sky
 
-  // ---------------------------------------------------------------------------
-  // Status: semantic only, never decorative. Fill for badges, banners and
-  // toasts; the `on` key is text on that fill. The plain key is also safe as
-  // text on `surface`.
-  // ---------------------------------------------------------------------------
-  success: "#15803D",
+  success: "#2D7A4A",
   onSuccess: "#FFFFFF",
-  warning: "#B45309",
+  warning: "#B87F0A",
   onWarning: "#FFFFFF",
-  error: "#B91C1C",
+  error: "#D33D44",
   onError: "#FFFFFF",
-  info: "#1D4ED8",
+  info: "#1F5FAE",
   onInfo: "#FFFFFF",
 
-  // ---------------------------------------------------------------------------
-  // Lines
-  // ---------------------------------------------------------------------------
-  border: "#E5E7EB", // hairline outline, 0.5pt or 1pt max: inputs, cards
-  borderStrong: "#D1D5DB", // focus rings, selected outlines, 1.5pt max
-  divider: "#E5E7EB", // subtle list separators
+  border: "#E6E2D8",
+  borderStrong: "#CFCAC0",
+  divider: "#E6E2D8",
+
+  pitchGreen: "#4A7A3B",
+  pitchGreenAlt: "#548743",
+  pitchLines: "rgba(255,255,255,0.75)",
+  overlay: "rgba(26,25,24,0.5)",
 };
 
 export type ThemeColors = typeof light;
