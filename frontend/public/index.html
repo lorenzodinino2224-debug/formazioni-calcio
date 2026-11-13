@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+    <title>Spoltore</title>
+    <meta name="theme-color" content="#7A1E2E" />
+    <meta name="description" content="Gestionale tecnico Città di Spoltore" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Spoltore" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <style id="expo-reset">
+      html,
+      body {
+        height: 100%;
+        background-color: #7A1E2E;
+      }
+      body {
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript>Per usare l'app abilita JavaScript.</noscript>
+    <div id="root"></div>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker
+            .register("/sw.js", { scope: "/" })
+            .then(function (reg) {
+              // Cache every file the first visit already downloaded (bundle, fonts, images),
+              // so the app opens offline from the next launch.
+              setTimeout(function () {
+                var urls = performance
+                  .getEntriesByType("resource")
+                  .map(function (e) { return e.name; })
+                  .filter(function (u) { return u.indexOf(location.origin) === 0 && u.indexOf("/api/") === -1; });
+                urls.push(location.origin + "/");
+                navigator.serviceWorker.ready.then(function (r) {
+                  if (r.active) r.active.postMessage({ type: "cache-urls", urls: urls });
+                });
+              }, 4000);
+            })
+            .catch(function () {});
+        });
+      }
+    </script>
+  </body>
+</html>

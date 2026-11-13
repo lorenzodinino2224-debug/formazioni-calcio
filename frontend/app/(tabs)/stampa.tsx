@@ -5,6 +5,7 @@ import { ActivityIndicator, Platform, Pressable, ScrollView, Text, TextInput, Vi
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { BackupSection } from "@/src/components/BackupSection";
 import { ScreenHeader } from "@/src/components/ScreenHeader";
 import { useToast } from "@/src/components/Toast";
 import { useData } from "@/src/data/store";
@@ -79,7 +80,7 @@ export default function StampaScreen() {
 
   return (
     <View style={styles.root}>
-      <ScreenHeader title="Moduli e stampa" subtitle="PDF da stampare o inviare" />
+      <ScreenHeader title="Stampa e backup" subtitle="Moduli PDF e salvataggio dati" />
       <KeyboardAwareScrollView bottomOffset={24} contentContainerStyle={{ padding: 16, paddingBottom: bottomChrome + 24 }}>
         {docs.map((d) => (
           <View key={d.key} style={styles.card} testID={`doc-card-${d.key}`}>
@@ -169,6 +170,7 @@ export default function StampaScreen() {
             <Text style={styles.primaryText}>Salva dati</Text>
           </Pressable>
         </View>
+        <BackupSection />
       </KeyboardAwareScrollView>
     </View>
   );

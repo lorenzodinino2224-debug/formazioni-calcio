@@ -18,6 +18,12 @@ export function deletePhoto(uri: string | null) {
   }
 }
 
+export function resolvePhotoUrl(ref: string | null | undefined): string | null {
+  return ref ?? null;
+}
+
+export async function preloadPhotos(_refs: (string | null)[]) {}
+
 export async function photoToDataUri(uri: string | null): Promise<string | null> {
   if (!uri) return null;
   if (uri.startsWith("data:")) return uri;

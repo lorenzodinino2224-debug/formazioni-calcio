@@ -4,9 +4,10 @@ import { useMemo, useState } from "react";
 import { Pressable, ScrollView, SectionList, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { backupSupported, isStandalone } from "@/src/backup";
 import { Avatar } from "@/src/components/Avatar";
 import { ScreenHeader } from "@/src/components/ScreenHeader";
-import { useData } from "@/src/data/store";
+import { backupOverdue, useData } from "@/src/data/store";
 import { ROLES, Role, fullName, sortPlayers } from "@/src/data/types";
 import { usesNativeTabs } from "@/src/navigation";
 import { makeStyles, useTheme } from "@/src/theme";
@@ -17,8 +18,10 @@ export default function RosaScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const bottomChrome = usesNativeTabs ? insets.bottom : 0;
-  const { players } = useData();
+  const { players, lastBackup, installDismissed, dismissInstall } = useData();
   const [filter, setFilter] = useState<Role | "ALL">("ALL");
+  const showInstall = backupSupported && !installDismissed && !isStandalone();
+  const showBackup = backupSupported && backupOverdue(lastBackup, players.length > 0);
 
   const sections = useMemo(() => {
     const sorted = sortPlayers(players);
@@ -32,6 +35,25 @@ export default function RosaScreen() {
   return (
     <View style={styles.root}>
       <ScreenHeader title="Rosa" subtitle={`${players.length} giocatori`} />
+      {showInstall ? (
+        <View style={styles.banner} testID="install-banner">
+          <Ionicons name="add-circle-outline" size={20} color={colors.brandSecondary} />
+          <Text style={styles.bannerText}>
+            Installa l&apos;app: tocca Condividi e poi &quot;Aggiungi alla schermata Home&quot;.
+          </Text>
+          <Pressable onPress={dismissInstall} hitSlop={10} style={styles.bannerClose} testID="install-banner-close">
+            <Ionicons name="close" size={20} color={colors.muted} />
+          </Pressable>
+        </View>
+      ) : showBackup ? (
+        <Pressable style={styles.banner} onPress={() => router.push("/(tabs)/stampa")} testID="backup-reminder-banner">
+          <Ionicons name="warning-outline" size={20} color={colors.warning} />
+          <Text style={styles.bannerText}>
+            {lastBackup ? "Backup più vecchio di 30 giorni." : "Nessun backup ancora."} I dati sono solo su questo iPhone: tocca per esportarli.
+          </Text>
+          <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+        </Pressable>
+      ) : null}
       <View style={styles.chipRow}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
           {[{ key: "ALL" as const, plural: "Tutti" }, ...ROLES].map((r) => {
@@ -115,6 +137,18 @@ export default function RosaScreen() {
 
 const useStyles = makeStyles((c) => ({
   root: { flex: 1, backgroundColor: c.surface },
+  banner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: c.brandTertiary,
+    borderBottomWidth: 1,
+    borderBottomColor: c.border,
+  },
+  bannerText: { flex: 1, fontSize: 13, color: c.onSurfaceTertiary, fontWeight: "600" },
+  bannerClose: { width: 32, height: 32, alignItems: "center", justifyContent: "center" },
   chipRow: { height: 56, backgroundColor: c.surfaceSecondary, borderBottomWidth: 1, borderBottomColor: c.border, justifyContent: "center" },
   chips: { gap: 8, paddingHorizontal: 16, alignItems: "center" },
   chip: {

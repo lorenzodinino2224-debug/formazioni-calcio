@@ -50,8 +50,7 @@ export default function PlayerForm() {
     mediaTypes: ["images"],
     allowsEditing: true,
     aspect: [1, 1],
-    quality: 0.5,
-    base64: Platform.OS === "web",
+    quality: 0.7,
   };
 
   const pickGallery = async () => handleResult(await ImagePicker.launchImageLibraryAsync(opts));
@@ -127,7 +126,7 @@ export default function PlayerForm() {
           <View style={{ flex: 1, gap: 8 }}>
             <Pressable style={styles.photoBtn} onPress={pickGallery} testID="player-photo-gallery-button">
               <Ionicons name="images-outline" size={18} color={colors.brandSecondary} />
-              <Text style={styles.photoBtnText}>Dalla galleria</Text>
+              <Text style={styles.photoBtnText}>{Platform.OS === "web" ? "Scegli o scatta foto" : "Dalla galleria"}</Text>
             </Pressable>
             {Platform.OS !== "web" && (
               <Pressable style={styles.photoBtn} onPress={takePhoto} testID="player-photo-camera-button">

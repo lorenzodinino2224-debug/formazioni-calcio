@@ -1,6 +1,7 @@
 import { Image } from "expo-image";
 import { Text, View } from "react-native";
 
+import { resolvePhotoUrl } from "@/src/data/photos";
 import { Player } from "@/src/data/types";
 import { makeStyles } from "@/src/theme";
 
@@ -9,6 +10,7 @@ export function Avatar({ player, size = 48, ring }: { player?: Player; size?: nu
   const initials = player
     ? `${player.firstName.charAt(0)}${player.lastName.charAt(0)}`.toUpperCase()
     : "";
+  const uri = resolvePhotoUrl(player?.photo);
   return (
     <View
       style={[
@@ -17,8 +19,8 @@ export function Avatar({ player, size = 48, ring }: { player?: Player; size?: nu
         ring && styles.ring,
       ]}
     >
-      {player?.photo ? (
-        <Image source={{ uri: player.photo }} style={{ width: "100%", height: "100%" }} contentFit="cover" />
+      {uri ? (
+        <Image source={{ uri }} style={{ width: "100%", height: "100%" }} contentFit="cover" />
       ) : (
         <Text style={[styles.initials, { fontSize: size * 0.36 }]}>{initials}</Text>
       )}

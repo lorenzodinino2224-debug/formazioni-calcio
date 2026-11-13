@@ -1,17 +1,10 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import { storage } from "@/src/utils/storage";
+import { initDb, kvGet, kvSet } from "./db";
+import { KEYS } from "./keys";
 import { emptySlots } from "./modules";
-import { deletePhoto } from "./photos";
+import { deletePhoto, preloadPhotos } from "./photos";
 import { Callup, Lineup, Player, Scheme, Settings, uid } from "./types";
-
-const KEYS = {
-  players: "spoltore_players",
-  lineup: "spoltore_lineup",
-  schemes: "spoltore_schemes",
-  callups: "spoltore_callups",
-  settings: "spoltore_settings",
-};
 
 const DEFAULT_SETTINGS: Settings = {
   teamName: "Città di Spoltore",
@@ -22,18 +15,8 @@ const DEFAULT_SETTINGS: Settings = {
 
 const DEFAULT_LINEUP: Lineup = { module: "4-4-2", slots: emptySlots(), bench: [] };
 
-async function load<T>(key: string, fallback: T): Promise<T> {
-  const raw = await storage.getItem(key, null);
-  if (typeof raw !== "string") return fallback;
-  try {
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
-  }
-}
-
 function save(key: string, value: unknown) {
-  storage.setItem(key, JSON.stringify(value));
+  kvSet(key, value).catch(() => {});
 }
 
 type Ctx = {
@@ -43,6 +26,8 @@ type Ctx = {
   schemes: Scheme[];
   callups: Callup[];
   settings: Settings;
+  lastBackup: string | null;
+  installDismissed: boolean;
   savePlayer: (p: Player) => void;
   deletePlayer: (id: string) => void;
   setLineup: (l: Lineup) => void;
@@ -51,6 +36,9 @@ type Ctx = {
   saveCallup: (c: Callup) => void;
   deleteCallup: (id: string) => void;
   saveSettings: (s: Settings) => void;
+  markBackup: () => void;
+  dismissInstall: () => void;
+  reload: () => Promise<void>;
   playerById: (id: string | null | undefined) => Player | undefined;
 };
 
@@ -63,24 +51,39 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [schemes, setSchemes] = useState<Scheme[]>([]);
   const [callups, setCallups] = useState<Callup[]>([]);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [lastBackup, setLastBackup] = useState<string | null>(null);
+  const [installDismissed, setInstallDismissed] = useState(false);
+
+  const reload = useCallback(async () => {
+    const [p, l, s, c, st, lb, inst] = await Promise.all([
+      kvGet<Player[]>(KEYS.players, []),
+      kvGet<Lineup>(KEYS.lineup, DEFAULT_LINEUP),
+      kvGet<Scheme[]>(KEYS.schemes, []),
+      kvGet<Callup[]>(KEYS.callups, []),
+      kvGet<Settings>(KEYS.settings, DEFAULT_SETTINGS),
+      kvGet<string | null>(KEYS.lastBackup, null),
+      kvGet<boolean>(KEYS.installDismissed, false),
+    ]);
+    await preloadPhotos(p.map((x) => x.photo));
+    setPlayers(p);
+    setLineupState(l);
+    setSchemes(s);
+    setCallups(c);
+    setSettings({ ...DEFAULT_SETTINGS, ...st });
+    setLastBackup(lb);
+    setInstallDismissed(inst);
+  }, []);
 
   useEffect(() => {
     (async () => {
-      const [p, l, s, c, st] = await Promise.all([
-        load<Player[]>(KEYS.players, []),
-        load<Lineup>(KEYS.lineup, DEFAULT_LINEUP),
-        load<Scheme[]>(KEYS.schemes, []),
-        load<Callup[]>(KEYS.callups, []),
-        load<Settings>(KEYS.settings, DEFAULT_SETTINGS),
-      ]);
-      setPlayers(p);
-      setLineupState(l);
-      setSchemes(s);
-      setCallups(c);
-      setSettings({ ...DEFAULT_SETTINGS, ...st });
-      setHydrated(true);
+      try {
+        await initDb();
+        await reload();
+      } finally {
+        setHydrated(true);
+      }
     })();
-  }, []);
+  }, [reload]);
 
   const savePlayer = useCallback((p: Player) => {
     setPlayers((prev) => {
@@ -124,10 +127,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const saveScheme = useCallback(
     (name: string) => {
       setSchemes((prev) => {
-        const next = [
-          { ...lineup, id: uid(), name, createdAt: new Date().toISOString() },
-          ...prev,
-        ];
+        const next = [{ ...lineup, id: uid(), name, createdAt: new Date().toISOString() }, ...prev];
         save(KEYS.schemes, next);
         return next;
       });
@@ -165,6 +165,17 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     save(KEYS.settings, s);
   }, []);
 
+  const markBackup = useCallback(() => {
+    const now = new Date().toISOString();
+    setLastBackup(now);
+    save(KEYS.lastBackup, now);
+  }, []);
+
+  const dismissInstall = useCallback(() => {
+    setInstallDismissed(true);
+    save(KEYS.installDismissed, true);
+  }, []);
+
   const playerById = useCallback(
     (id: string | null | undefined) => (id ? players.find((p) => p.id === id) : undefined),
     [players],
@@ -178,6 +189,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       schemes,
       callups,
       settings,
+      lastBackup,
+      installDismissed,
       savePlayer,
       deletePlayer,
       setLineup,
@@ -186,9 +199,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       saveCallup,
       deleteCallup,
       saveSettings,
+      markBackup,
+      dismissInstall,
+      reload,
       playerById,
     }),
-    [hydrated, players, lineup, schemes, callups, settings, savePlayer, deletePlayer, setLineup, saveScheme, deleteScheme, saveCallup, deleteCallup, saveSettings, playerById],
+    [hydrated, players, lineup, schemes, callups, settings, lastBackup, installDismissed, savePlayer, deletePlayer, setLineup, saveScheme, deleteScheme, saveCallup, deleteCallup, saveSettings, markBackup, dismissInstall, reload, playerById],
   );
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
@@ -198,4 +214,10 @@ export function useData() {
   const ctx = useContext(DataContext);
   if (!ctx) throw new Error("useData outside DataProvider");
   return ctx;
+}
+
+export function backupOverdue(lastBackup: string | null, hasData: boolean) {
+  if (!hasData) return false;
+  if (!lastBackup) return true;
+  return Date.now() - new Date(lastBackup).getTime() > 30 * 24 * 3600 * 1000;
 }

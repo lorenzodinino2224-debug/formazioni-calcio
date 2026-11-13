@@ -143,9 +143,36 @@ ${marks}</div>`;
   return page("Formazione in campo", settings, body);
 }
 
+// Web (Safari): render the document in a hidden iframe and open the system print sheet,
+// from which iPhone lets you print, save to Files or share the PDF.
+function printInIframe(html: string): Promise<void> {
+  return new Promise((resolve) => {
+    const frame = document.createElement("iframe");
+    frame.setAttribute("aria-hidden", "true");
+    frame.style.cssText = "position:fixed;left:-10000px;top:0;width:800px;height:1130px;border:0;";
+    document.body.appendChild(frame);
+    const win = frame.contentWindow!;
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    const go = () => {
+      win.focus();
+      win.print();
+      setTimeout(() => {
+        frame.remove();
+        resolve();
+      }, 1500);
+    };
+    const imgs = Array.from(win.document.images);
+    Promise.all(imgs.map((i) => (i.complete ? Promise.resolve() : new Promise((r) => (i.onload = i.onerror = r))))).then(() =>
+      setTimeout(go, 150),
+    );
+  });
+}
+
 export async function sharePdf(html: string, title: string) {
   if (Platform.OS === "web") {
-    await Print.printAsync({ html });
+    await printInIframe(html);
     return;
   }
   const { uri } = await Print.printToFileAsync({ html });
@@ -157,5 +184,6 @@ export async function sharePdf(html: string, title: string) {
 }
 
 export async function printPdf(html: string) {
+  if (Platform.OS === "web") return printInIframe(html);
   await Print.printAsync({ html });
 }

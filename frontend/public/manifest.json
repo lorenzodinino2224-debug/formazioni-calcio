@@ -1,0 +1,17 @@
+{
+  "name": "Città di Spoltore – Gestionale Tecnico",
+  "short_name": "Spoltore",
+  "description": "Rosa, formazione, convocati e moduli PDF della Città di Spoltore. Dati salvati solo sul dispositivo.",
+  "lang": "it",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#7A1E2E",
+  "theme_color": "#7A1E2E",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
